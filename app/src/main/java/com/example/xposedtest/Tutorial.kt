@@ -29,57 +29,57 @@ public class Tutorial : IXposedHookLoadPackage{
 
         XposedBridge.log("Hello XPosed")
 
-        // クロックの色変えるチュートリアル
-        findAndHookMethod(
-            "com.android.systemui.statusbar.policy.Clock",
-            lpparam.classLoader,
-            "updateClock",
-            object : XC_MethodHook() {
-                @Throws(Throwable::class)
-                override fun beforeHookedMethod(param: MethodHookParam) {
-                    // this will be called before the clock was updated by the original method
-                    // XposedBridge.log("updateClock Before Hooked")
-                }
-
-                @Throws(Throwable::class)
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    // XposedBridge.log("updateClock After Hooked")
-                    val tv = param.thisObject as TextView
-                    val text = tv.text.toString()
-                    tv.text = "${text}" // "${text}:)"
-                    tv.setTextColor(Color.CYAN)
-                }
-            })
-
-
-//        // やっぱりキーガード（画面ロック時）のキャリアラベル。
+//        // クロックの色変えるチュートリアル
 //        findAndHookMethod(
-//            "com.android.systemui.statusbar.phone.KeyguardStatusBarView",
+//            "com.android.systemui.statusbar.policy.Clock",
 //            lpparam.classLoader,
-//            "onFinishInflate",
+//            "updateClock",
 //            object : XC_MethodHook() {
 //                @Throws(Throwable::class)
 //                override fun beforeHookedMethod(param: MethodHookParam) {
 //                    // this will be called before the clock was updated by the original method
-//                    // XposedBridge.log("KSBV Before Hooked")
+//                    // XposedBridge.log("updateClock Before Hooked")
 //                }
 //
 //                @Throws(Throwable::class)
 //                override fun afterHookedMethod(param: MethodHookParam) {
-//                    XposedBridge.log("KSBV After Hooked")
-//
-//                    val rl = param.thisObject as RelativeLayout
-//                    val mContext = XposedHelpers.getObjectField(rl, "mContext") as Context
-//                    val res: Resources = mContext.getResources()
-//                    val id = res.getIdentifier("keyguard_carrier_text", "id", "com.android.systemui")
-//                    XposedBridge.log("ZZZZ: " + id)
-//
-//                    val cl_tv = rl.findViewById<TextView>(id)
-//                    XposedBridge.log("ZZZZ: " + cl_tv.text)
-//                    cl_tv.visibility = View.GONE
+//                    // XposedBridge.log("updateClock After Hooked")
+//                    val tv = param.thisObject as TextView
+//                    val text = tv.text.toString()
+//                    tv.text = "${text}" // "${text}:)"
+//                    tv.setTextColor(Color.CYAN)
 //                }
-//            }
-//        )
+//            })
+
+
+        // キーガード（画面ロック時）のキャリアラベル。
+        findAndHookMethod(
+            "com.android.systemui.statusbar.phone.KeyguardStatusBarView",
+            lpparam.classLoader,
+            "onFinishInflate",
+            object : XC_MethodHook() {
+                @Throws(Throwable::class)
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    // this will be called before the clock was updated by the original method
+                }
+
+                @Throws(Throwable::class)
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    XposedBridge.log("onFinishInflate After Hooked")
+
+                    val rl = param.thisObject as RelativeLayout
+                    val mContext = XposedHelpers.getObjectField(rl, "mContext") as Context
+                    val res: Resources = mContext.getResources()
+                    val id = res.getIdentifier("keyguard_carrier_text", "id", "com.android.systemui")
+
+                    val cl_tv = rl.findViewById<TextView>(id)
+                    if(cl_tv != null) {
+                        XposedBridge.log("onFinishInflate 1:")
+                        cl_tv.visibility = View.GONE
+                    }
+                }
+            }
+        )
 
 
 //        // FeatureUtil dame
@@ -114,30 +114,19 @@ public class Tutorial : IXposedHookLoadPackage{
                     XposedBridge.log("updateIsKeygurad After Hooked")
 
                     val c = findClass("com.android.systemui.statusbar.phone.StatusBar", lpparam.classLoader)
-                    XposedBridge.log("UPIK 0: " + c)
-                    //NG val b = getObjectField(c, "mCarrierText")
+                    XposedBridge.log("updateIsKeyguard 0: " + c)
                     val b = findFieldIfExists(c, "mCarrierText")
-                    XposedBridge.log("UPIK 1: " + b)
-                    // val k = findConstructorBestMatch(c, "mCarrierText")
-                    // XposedBridge.log("UPIK 2: " + k)
+                    XposedBridge.log("updateIsKeyguard 1: " + b)
                     if(b!=null){
-                        XposedBridge.log("UPIK 3: ")
-                        try {
-                            var d = b.get(param.thisObject)
-                            XposedBridge.log("UPIK 4: " + d)
-                            callMethod(d, "setVisibility", View.GONE)
-                            XposedBridge.log("UPIK 5: ")
-                        }catch (ex:Exception){
-                            XposedBridge.log(ex)
-                        }
+                        XposedBridge.log("updateIsKeyguard 3: ")
                         try {
                             var d = b.get(param.thisObject) as TextView?
+                            XposedBridge.log("updateIsKeyguard 4: " + d)
                             if(d!=null) {
-                                XposedBridge.log("UPIK 6: " + d.text)
-                                d.text = "Unko"
-                                XposedBridge.log("UPIK 7: " + d.visibility)
+                                XposedBridge.log("updateIsKeyguard 6: " + d.text + d.visibility)
+                                d.text = ""
                                 d.visibility = View.GONE
-                                XposedBridge.log("UPIK 8: " + d.visibility)
+                                XposedBridge.log("updateIsKeyguard 7: " + d.text + d.visibility)
                                 val p = d.parent as ViewGroup
                                 p.removeView(d)
                             }
@@ -149,29 +138,29 @@ public class Tutorial : IXposedHookLoadPackage{
             }
         )
 
-        // kore
-        // 消えるけど何かのタイミングで戻る。
-        findAndHookMethod(
-            "com.android.keyguard.CarrierText",
-            lpparam.classLoader,
-            "updateCarrierText",
-            object : XC_MethodHook() {
-                @Throws(Throwable::class)
-                override fun beforeHookedMethod(param: MethodHookParam) {
-                    // this will be called before the clock was updated by the original method
-                }
-
-                @Throws(Throwable::class)
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    XposedBridge.log("uCT After Hooked")
-                    var tv = param.thisObject as TextView
-                    XposedBridge.log("uCT 0: " + tv.text + tv.visibility)
-                    tv.visibility = View.GONE
-                    tv.text = "Dokuten"
-                    XposedBridge.log("uCT 1: " + tv.text + tv.visibility)
-                }
-            }
-        )
+//        // kore
+//        // 消えるけど何かのタイミングで戻る。
+//        findAndHookMethod(
+//            "com.android.keyguard.CarrierText",
+//            lpparam.classLoader,
+//            "updateCarrierText",
+//            object : XC_MethodHook() {
+//                @Throws(Throwable::class)
+//                override fun beforeHookedMethod(param: MethodHookParam) {
+//                    // this will be called before the clock was updated by the original method
+//                }
+//
+//                @Throws(Throwable::class)
+//                override fun afterHookedMethod(param: MethodHookParam) {
+//                    XposedBridge.log("uCT After Hooked")
+//                    var tv = param.thisObject as TextView
+//                    XposedBridge.log("uCT 0: " + tv.text + tv.visibility)
+//                    tv.visibility = View.GONE
+//                    tv.text = "Dokuten"
+//                    XposedBridge.log("uCT 1: " + tv.text + tv.visibility)
+//                }
+//            }
+//        )
 
 //        // kari 呼ばれてない。
 //        findAndHookMethod(
@@ -290,6 +279,28 @@ public class Tutorial : IXposedHookLoadPackage{
 //                }
 //            }
 //        )
+
+
+
+
+        ///--- 壁紙変更
+        findAndHookMethod(
+            "com.android.systemui.ImageWallpaper",
+            lpparam.classLoader,
+            "getWhiteWallpaper",
+            object : XC_MethodHook() {
+                @Throws(Throwable::class)
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    // this will be called before the clock was updated by the original method
+                }
+
+                @Throws(Throwable::class)
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    XposedBridge.log("getWhiteWallpaper After Hooked")
+                    param.result = null
+                }
+            }
+        )
     }
 
 }
