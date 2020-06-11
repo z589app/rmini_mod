@@ -1,8 +1,7 @@
-package com.example.xposedtest
+package com.z589app.xposedtest
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
@@ -14,7 +13,6 @@ import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.XposedHelpers.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 import java.lang.Exception
-import java.sql.Types.NULL
 
 
 public class Tutorial : IXposedHookLoadPackage{

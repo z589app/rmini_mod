@@ -1,4 +1,4 @@
-package com.example.xposedtest
+package com.z589app.xposedtest
 
 import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
