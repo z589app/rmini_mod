@@ -1,4 +1,4 @@
-package com.z589app.xposedtest
+package com.z589app.rmini_mod
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.z589app.xposedtest", appContext.packageName)
+        assertEquals("com.z589app.rmini_mod", appContext.packageName)
     }
 }

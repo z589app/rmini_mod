@@ -1,4 +1,4 @@
-package com.z589app.xposedtest
+package com.z589app.rmini_mod
 
 import org.junit.Test
 

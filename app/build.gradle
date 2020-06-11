@@ -6,7 +6,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        applicationId "com.z589app.xposedtest"
+        applicationId "com.z589app.rmini_mod"
         minSdkVersion 28
         targetSdkVersion 29
         versionCode 1
