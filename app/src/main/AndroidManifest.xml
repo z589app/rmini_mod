@@ -24,7 +24,7 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="XPosed Rakuten mini Module by z589app" />
+            android:value="XPosed Rakuten mini Mod Module" />
         <meta-data
             android:name="xposedminversion"
             android:value="53" />
