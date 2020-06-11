@@ -1,12 +1,13 @@
 package com.z589app.rmini_mod
 
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import com.z589app.rmini_mod.R
+import androidx.navigation.fragment.findNavController
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,8 +33,14 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings -> {
+                Log.d("ZK", R.id.action_to_SettingFragment.toString())
+                Log.d("ZK", supportFragmentManager.primaryNavigationFragment?.id.toString())
+                supportFragmentManager.primaryNavigationFragment?.findNavController()?.navigate(R.id.action_to_SettingFragment)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
+
 }
