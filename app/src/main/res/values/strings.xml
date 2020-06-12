@@ -24,4 +24,14 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="settings_fragment_label">Settings</string>
+
+    <string name="key_change_wallpaper">key_pref_change_wallpaper</string>
+    <string name="title_change_wallpaper">Changeable wallpaper</string>
+    <string name="key_remove_carrier_statusbar">key_pref_remove_carrier_text_status_bar</string>
+    <string name="title_remove_carrier_statusbar">Remove in Status Bar</string>
+    <string name="key_remove_carrier_keyguard">key_pref_remove_carrier_text_keyguard</string>
+    <string name="title_remove_carrier_keyguard">Remove in Keyguard</string>
+    <string name="statubar">Status Bar</string>
+    <string name="wallpaper">Wallpaper</string>
+    <string name="need_reboot">A reboot is reuired to reflect</string>
 </resources>
