@@ -150,12 +150,48 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
             )
         }
 
+//        if (true) {
+//            /// 時計右寄せ
+//            findAndHookMethod(
+//                "com.android.systemui.statusbar.policy.Clock",
+//                lpparam.classLoader,
+//                "getSmallTime",
+//                object : XC_MethodHook() {
+//                    @Throws(Throwable::class)
+//                    override fun beforeHookedMethod(param: MethodHookParam) {
+//                    }
+//
+//                    @Throws(Throwable::class)
+//                    override fun afterHookedMethod(param: MethodHookParam) {
+//                        XposedBridge.log("getSmallTime After Hooked")
+//
+//                        val clockTv = param.thisObject as TextView?
+//                        val parent = clockTv?.parent as LinearLayout
+//                        XposedBridge.log("PARENT: " + parent.childCount)
+//
+//                        clockTv?.gravity = Gravity.END or Gravity.CENTER_VERTICAL;
+//                        clockTv.setTextColor(Color.BLUE)
+//                        val lp = clockTv?.layoutParams as LinearLayout.LayoutParams
+//                        XposedBridge.log("LP: " + lp.gravity)
+//                        lp.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+//
+//                        //bootloop parent.removeView(clockTv)
+//                        //bootloop parent.addView(clockTv, lp)
+//
+////                        new ClockPositionInfo(parentRight, -1,
+////                        Gravity.END | Gravity.CENTER_VERTICAL,
+////                        mClock.getPaddingEnd(), mClock.getPaddingStart()));
+//                    }
+//                }
+//            )
+//        }
+
         if (true) {
-            /// 時計右寄せ
+            /// 時計右寄せ → 未完成
             findAndHookMethod(
-                "com.android.systemui.statusbar.policy.Clock",
+                "com.android.systemui.qs",
                 lpparam.classLoader,
-                "getSmallTime",
+                "onFinishInflate",
                 object : XC_MethodHook() {
                     @Throws(Throwable::class)
                     override fun beforeHookedMethod(param: MethodHookParam) {
@@ -163,29 +199,14 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
 
                     @Throws(Throwable::class)
                     override fun afterHookedMethod(param: MethodHookParam) {
-                        XposedBridge.log("getSmallTime After Hooked")
-
-                        val clockTv = param.thisObject as TextView?
-                        val parent = clockTv?.parent as LinearLayout
-                        XposedBridge.log("PARENT: " + parent.childCount)
-
-                        clockTv?.gravity = Gravity.END or Gravity.CENTER_VERTICAL;
-                        clockTv.setTextColor(Color.BLUE)
-                        val lp = clockTv?.layoutParams as LinearLayout.LayoutParams
-                        XposedBridge.log("LP: " + lp.gravity)
-                        lp.gravity = Gravity.END or Gravity.CENTER_VERTICAL
-
-                        //bootloop parent.removeView(clockTv)
-                        //bootloop parent.addView(clockTv, lp)
-
-//                        new ClockPositionInfo(parentRight, -1,
-//                        Gravity.END | Gravity.CENTER_VERTICAL,
-//                        mClock.getPaddingEnd(), mClock.getPaddingStart()));
+                        XposedBridge.log("qs.onFinishInflate After Hooked")
+                        val rl = param.thisObject as RelativeLayout
+                        val mClockView = XposedHelpers.getObjectField(rl, "mClockView") as TextView
+                        mClockView.setTextColor(Color.GREEN)
                     }
                 }
             )
         }
-
     }
 
 }
