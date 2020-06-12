@@ -2,8 +2,11 @@ package com.z589app.rmini_mod
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import de.robv.android.xposed.*
@@ -18,25 +21,24 @@ const val TARGET_PACKAGE = "com.android.systemui"
 // const val SHARED_PREF = "/storage/emulated/0/Android/data/com.z589app.rmini_mod/shared_prefs/com.z589app.rmini_mod_preferences.xml"
 // const val SHARED_PREF = "/sdcard/_rmini/com.z589app.rmini_mod_preferences.xml"
 
-public class Tutorial : IXposedHookLoadPackage{
+class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
     private var mContext: Context? = null
 
     @Throws(Throwable::class)
     override fun handleLoadPackage(lpparam: LoadPackageParam) {
         // XposedBridge.log("Loaded app: " + lpparam.packageName)
 
-        if(!lpparam.packageName.equals(TARGET_PACKAGE))
-            return;
+        if (!lpparam.packageName.equals(TARGET_PACKAGE))
+            return
 
         XposedBridge.log("Hello XPosed")
 
-        //TODO
         var changeWallpaperEnable = false
         var removeCarrierStatusBarEnable = false
         var removeCarrierKeyguardEnable = false
 
         val file = File(SHARED_PREF_DIR, SHARED_PREF_FILE)
-        if(file.exists()) {
+        if (file.exists()) {
             val xsp = XSharedPreferences(File(SHARED_PREF_DIR, SHARED_PREF_FILE))
             // val xsp = XSharedPreferences(BuildConfig.APPLICATION_ID)
             xsp.makeWorldReadable()
@@ -50,7 +52,7 @@ public class Tutorial : IXposedHookLoadPackage{
             removeCarrierKeyguardEnable = xsp.getBoolean("remove_carrier_keyguard", false)
         }
 
-        if(removeCarrierKeyguardEnable) {
+        if (removeCarrierKeyguardEnable) {
             // キーガード（画面ロック時）のキャリアラベル。
             findAndHookMethod(
                 "com.android.systemui.statusbar.phone.KeyguardStatusBarView",
@@ -68,7 +70,7 @@ public class Tutorial : IXposedHookLoadPackage{
 
                         val rl = param.thisObject as RelativeLayout
                         val mContext = XposedHelpers.getObjectField(rl, "mContext") as Context
-                        val res: Resources = mContext.getResources()
+                        val res: Resources = mContext.resources
                         val id =
                             res.getIdentifier("keyguard_carrier_text", "id", "com.android.systemui")
 
@@ -84,7 +86,7 @@ public class Tutorial : IXposedHookLoadPackage{
 
 
         // 無理やりView削除版
-        if(removeCarrierStatusBarEnable) {
+        if (removeCarrierStatusBarEnable) {
             findAndHookMethod(
                 "com.android.systemui.statusbar.phone.StatusBar",
                 lpparam.classLoader,
@@ -127,7 +129,7 @@ public class Tutorial : IXposedHookLoadPackage{
         }
 
 
-        if(changeWallpaperEnable) {
+        if (changeWallpaperEnable) {
             /// 壁紙変更
             findAndHookMethod(
                 "com.android.systemui.ImageWallpaper",
@@ -147,6 +149,43 @@ public class Tutorial : IXposedHookLoadPackage{
                 }
             )
         }
+
+        if (true) {
+            /// 時計右寄せ
+            findAndHookMethod(
+                "com.android.systemui.statusbar.policy.Clock",
+                lpparam.classLoader,
+                "getSmallTime",
+                object : XC_MethodHook() {
+                    @Throws(Throwable::class)
+                    override fun beforeHookedMethod(param: MethodHookParam) {
+                    }
+
+                    @Throws(Throwable::class)
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        XposedBridge.log("getSmallTime After Hooked")
+
+                        val clockTv = param.thisObject as TextView?
+                        val parent = clockTv?.parent as LinearLayout
+                        XposedBridge.log("PARENT: " + parent.childCount)
+
+                        clockTv?.gravity = Gravity.END or Gravity.CENTER_VERTICAL;
+                        clockTv.setTextColor(Color.BLUE)
+                        val lp = clockTv?.layoutParams as LinearLayout.LayoutParams
+                        XposedBridge.log("LP: " + lp.gravity)
+                        lp.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+
+                        //bootloop parent.removeView(clockTv)
+                        //bootloop parent.addView(clockTv, lp)
+
+//                        new ClockPositionInfo(parentRight, -1,
+//                        Gravity.END | Gravity.CENTER_VERTICAL,
+//                        mClock.getPaddingEnd(), mClock.getPaddingStart()));
+                    }
+                }
+            )
+        }
+
     }
 
 }

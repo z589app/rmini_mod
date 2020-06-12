@@ -3,16 +3,11 @@ package com.z589app.rmini_mod
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.setupActionBarWithNavController
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 
 const val REQUEST_CODE = 1
 
@@ -34,20 +29,12 @@ class MainActivity : AppCompatActivity() {
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             // Android 6.0 のみ、該当パーミッションが許可されていない場合
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                )
-            ) {
                 ActivityCompat.requestPermissions(
                     this, arrayOf(
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
                     ), REQUEST_CODE
                 )
-            }
         } else {
-            // 許可済みの場合、もしくはAndroid 6.0以前
-            // パーミッションが必要な処理
         }
 
     }
@@ -57,8 +44,8 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if(requestCode== REQUEST_CODE) {
-            if((!(grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED))){
+        if (requestCode == REQUEST_CODE) {
+            if ((!(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED))) {
                 finish()
             }
         }

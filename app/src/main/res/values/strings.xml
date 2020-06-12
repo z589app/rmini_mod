@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">rmini_mod</string>
+    <string name="app_name">RakutenMiniMod</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -34,4 +34,8 @@
     <string name="statubar">Status Bar</string>
     <string name="wallpaper">Wallpaper</string>
     <string name="need_reboot">A reboot is reuired to reflect</string>
+    <string name="app_url">https://github.com/z589app/rmini_mod</string>
+    <string name="author">z589app</string>
+    <string name="other">Other</string>
+    <string name="web_page">Go to web page</string>
 </resources>

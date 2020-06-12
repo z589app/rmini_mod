@@ -32,11 +32,13 @@ class SettingsFragment : PreferenceFragmentCompat(),
         p0?.edit()?.commit()
 
         val fromDir = File(context?.filesDir, "../shared_prefs")
-        val fromFile = fromDir.listFiles()[0]
+        val fromFile = fromDir.listFiles().get(0)
         Log.d(TAG_PREF, fromFile.toString())
         // val toDir = context?.getExternalFilesDir("../shared_prefs")
         val toDir = File(SHARED_PREF_DIR)
-        if(!toDir?.exists()!!) toDir?.mkdirs()
+        if (toDir != null) {
+            if (!(toDir.exists())) toDir.mkdirs()
+        }
         val toFile = File(toDir, SHARED_PREF_FILE)
         Log.d(TAG_PREF, toFile.toString())
 
