@@ -11,9 +11,9 @@ XPosed Module for Rakuten mini
 - [x] Change wallpaper
 - [x] Remove carrier label in status bar
 - [x] Remove carrier label on keyguard
+- [x] Remove NFC Icon
 
 ### Other works
-- [x] Release apk
 - [x] Select UI
 
 ### Permission

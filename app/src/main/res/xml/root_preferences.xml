@@ -20,6 +20,12 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/other">
+        <SwitchPreferenceCompat
+            app:key="remove_nfc_icon"
+            app:title="@string/title_remove_nfc_icon" ></SwitchPreferenceCompat>
+        <SwitchPreferenceCompat
+            app:key="move_clock_right"
+            app:title="@string/title_move_clock_right" app:isPreferenceVisible="false"></SwitchPreferenceCompat>
         <Preference
             android:title="@string/app_name"
             app:summary="@string/author">
