@@ -38,6 +38,6 @@
     <string name="author">z589app</string>
     <string name="other">他</string>
     <string name="web_page">Go to web page</string>
-    <string name="title_move_clock_right">Clock to Right</string>
+    <string name="title_move_clock_right">時計を右寄せ</string>
     <string name="title_remove_nfc_icon">NFCアイコン削除</string>
 </resources>

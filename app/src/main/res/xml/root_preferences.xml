@@ -24,9 +24,9 @@
 
     <PreferenceCategory app:title="@string/other">
         <SwitchPreferenceCompat
-            app:isPreferenceVisible="false"
             app:key="move_clock_right"
             app:summary="@string/title_move_clock_right"></SwitchPreferenceCompat>
+        <!--            app:isPreferenceVisible="false"-->
         <Preference
             android:title="@string/app_name"
             app:summary="@string/author">

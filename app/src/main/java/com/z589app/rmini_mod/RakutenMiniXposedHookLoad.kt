@@ -6,9 +6,11 @@ import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.view.children
 import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
@@ -54,7 +56,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
             changeWallpaperEnable = xsp.getBoolean("change_wallpaper", false)
             removeCarrierStatusBarEnable = xsp.getBoolean("remove_carrier_statusbar", false)
             removeCarrierKeyguardEnable = xsp.getBoolean("remove_carrier_keyguard", false)
-            // moveClockRight = xsp.getBoolean("move_clock_right", false)
+            moveClockRight = xsp.getBoolean("move_clock_right", false)
             removeNFCIcon = xsp.getBoolean("reove_nfc_icon", false)
         }
 
@@ -155,14 +157,12 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                 }
             )
         }
-
         if (moveClockRight) {
             /// 時計右寄せ → テスト中
             findAndHookMethod(
-                "com.android.systemui.statusbar.policy.Clock",
+                "com.android.systemui.statusbar.phone.PhoneStatusBarView",
                 lpparam.classLoader,
-                // "updateClockVisibility",
-                "getSmallTime",
+                "onFinishInflate",
                 object : XC_MethodHook() {
                     @Throws(Throwable::class)
                     override fun beforeHookedMethod(param: MethodHookParam) {
@@ -170,61 +170,140 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
 
                     @Throws(Throwable::class)
                     override fun afterHookedMethod(param: MethodHookParam) {
-                        if (doing == false) {
-                            doing = true
-                            XposedBridge.log("updateClockVisibility After Hooked")
+                        XposedBridge.log("TEST: " + param.thisObject)
+                        val psbView = param.thisObject as FrameLayout
 
-                            val clockTv = param.thisObject as TextView?
-                            val parent = clockTv?.parent as LinearLayout
-                            XposedBridge.log("updateClockVisibility Parent: " + parent.javaClass.`package`)
-//                            if(parent.parent!=null){
-//                                XposedBridge.log("updateClockVisibility Parent Parent: " + parent.parent)
-//                                val pp = parent.parent as FrameLayout
+//                        // ステータスバーのレイアウト構造。
+//                        // 有益なデバッグ情報
+//                        for(child in psbView.children) {
+//                            XposedBridge.log("TEST Child: " + child)
+//                            if(child is ViewGroup){
+//                                for(gChild in child.children) {
+//                                    XposedBridge.log("TEST gChild: " + gChild)
+//                                    if(gChild is ViewGroup){
+//                                        for(ggChild in gChild.children) {
+//                                            XposedBridge.log("TEST ggChild: " + ggChild)
+//                                            if(ggChild is ViewGroup) {
+//                                                for(gggChild in ggChild.children) {
+//                                                    XposedBridge.log("TEST gggChild: " + gggChild)
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
 //                            }
+//                        }
 
-                            clockTv?.gravity = Gravity.END or Gravity.CENTER_VERTICAL;
-                            clockTv.setTextColor(Color.BLUE)
-                            val clockTvIndex = parent.indexOfChild(clockTv)
-                            val childcount = parent.childCount
+                        val res = psbView.context.resources
+                        val leftSide = psbView.findViewById<LinearLayout>(res.getIdentifier("status_bar_left_side", "id", "com.android.systemui"))
+                        XposedBridge.log("TEST leftSide: " + leftSide)
 
-                            val lp = clockTv?.layoutParams as LinearLayout.LayoutParams
-                            XposedBridge.log("updateClockVisibility Gravity: " + lp.gravity)
-                            lp.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+                        if(leftSide!=null) {
+                            val clockTv = leftSide.findViewById<TextView>(
+                                res.getIdentifier(
+                                    "clock",
+                                    "id",
+                                    "com.android.systemui"
+                                )
+                            )
+                            XposedBridge.log("TEST clockTv: " + clockTv)
 
-                            if (clockTvIndex != childcount - 1) {
-                                XposedBridge.log("updateClockVisibility Child Count: " + clockTvIndex + " of " + childcount)
-                                val children = arrayOfNulls<View>(childcount - 1)
-                                var k = 0
-                                for (i in 0 until childcount) {
-                                    if (i != clockTvIndex) {
-                                        children[k] = parent.getChildAt(i)
-                                        XposedBridge.log("updateClockVisibility removeView: " + i)
-                                        parent.removeView(children[k])
-                                        k += 1
-                                    }
-                                }
-                                XposedBridge.log("updateClockVisibility addView start")
-                                for (i in 0 until childcount - 1) {
-                                    try {
-                                        XposedBridge.log("updateClockVisibility addView: " + i)
-                                        if (children[i] != null) {
-                                            parent.addView(children[i], i)
-                                        }
-                                    } catch (ex: Exception) {
-                                        XposedBridge.log(ex)
-                                    }
+                            if(clockTv!=null) {
+                                val systemIcons = psbView.findViewById<LinearLayout>(
+                                    res.getIdentifier(
+                                        "system_icons",
+                                        "id",
+                                        "com.android.systemui"
+                                    )
+                                )
+                                XposedBridge.log("TEST systemIcons: " + systemIcons)
+
+                                if(systemIcons!=null){
+                                    leftSide.removeView(clockTv)
+                                    systemIcons.addView(clockTv)
                                 }
                             }
-                            XposedBridge.log("updateClockVisibility Done")
-                            doing = false
-                        } else {
-                            XposedBridge.log("doing = true")
                         }
-
                     }
                 }
             )
         }
+
+//        if (moveClockRight) {
+//            /// 時計右寄せ → テスト中
+//            findAndHookMethod(
+//                "com.android.systemui.statusbar.policy.Clock",
+//                lpparam.classLoader,
+//                // "updateClockVisibility",
+//                "getSmallTime",
+//                object : XC_MethodHook() {
+//                    @Throws(Throwable::class)
+//                    override fun beforeHookedMethod(param: MethodHookParam) {
+//                    }
+//
+//                    @Throws(Throwable::class)
+//                    override fun afterHookedMethod(param: MethodHookParam) {
+//                        if (doing == false) {
+//                            doing = true
+//                            XposedBridge.log("updateClockVisibility After Hooked")
+//
+//                            val clockTv = param.thisObject as TextView?
+//                            val parent = clockTv?.parent as LinearLayout
+//                            XposedBridge.log("updateClockVisibility Parent: " + parent.javaClass.`package`)
+//
+//                            clockTv?.gravity = Gravity.END or Gravity.CENTER_VERTICAL;
+//                            clockTv.setTextColor(Color.BLUE)
+//                            val clockTvIndex = parent.indexOfChild(clockTv)
+//                            val childcount = parent.childCount
+//
+//                            val lp = clockTv?.layoutParams as LinearLayout.LayoutParams
+//                            XposedBridge.log("updateClockVisibility Gravity: " + lp.gravity)
+//                            lp.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+//
+//                            if (clockTvIndex != childcount - 1) {
+//                                XposedBridge.log("updateClockVisibility Child Count: " + clockTvIndex + " of " + childcount)
+//                                val children = arrayOfNulls<View>(childcount - 1)
+//                                var k = 0
+//                                for (i in 0 until childcount) {
+//                                    if (i != clockTvIndex) {
+//                                        children[k] = parent.getChildAt(i)
+//                                        XposedBridge.log("updateClockVisibility removeView: " + i)
+//                                        parent.removeView(children[k])
+//                                        k += 1
+//                                    }else{
+////                                        try {
+////                                            val pp = parent.parent as FrameLayout
+////                                            if(pp!=null) {
+////                                                parent.removeView(clockTv)
+////                                                pp.addView(clockTv)
+////                                            }
+////                                        }catch (ex: Exception) {
+////                                            XposedBridge.log(ex)
+////                                        }
+//                                    }
+//                                }
+//                                XposedBridge.log("updateClockVisibility addView start")
+//                                for (i in 0 until childcount - 1) {
+//                                    try {
+//                                        XposedBridge.log("updateClockVisibility addView: " + i)
+//                                        if (children[i] != null) {
+//                                            parent.addView(children[i], i)
+//                                        }
+//                                    } catch (ex: Exception) {
+//                                        XposedBridge.log(ex)
+//                                    }
+//                                }
+//                            }
+//                            XposedBridge.log("updateClockVisibility Done")
+//                            doing = false
+//                        } else {
+//                            XposedBridge.log("doing = true")
+//                        }
+//
+//                    }
+//                }
+//            )
+//        }
 
 //        /// 時計右寄せ → エラー
 //        if (moveClockRight) {
@@ -274,7 +353,9 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                             lpparam, param,
                             "java.lang.String", "mNFC"
                         )
-                        callMethod(mIconController, "setIconVisibility", mNFC, false)
+                        if(mIconController!=null && mNFC!=null) {
+                            callMethod(mIconController, "setIconVisibility", mNFC, false)
+                        }
                     }
                 }
             )
