@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -29,11 +28,11 @@ class MainActivity : AppCompatActivity() {
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             // Android 6.0 のみ、該当パーミッションが許可されていない場合
-                ActivityCompat.requestPermissions(
-                    this, arrayOf(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ), REQUEST_CODE
-                )
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ), REQUEST_CODE
+            )
         } else {
         }
 

@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -14,7 +13,6 @@ import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 import java.io.File
-import java.lang.Exception
 
 
 const val TARGET_PACKAGE = "com.android.systemui"
@@ -172,7 +170,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
 
                     @Throws(Throwable::class)
                     override fun afterHookedMethod(param: MethodHookParam) {
-                        if(doing==false) {
+                        if (doing == false) {
                             doing = true
                             XposedBridge.log("updateClockVisibility After Hooked")
 
@@ -193,7 +191,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                             XposedBridge.log("updateClockVisibility Gravity: " + lp.gravity)
                             lp.gravity = Gravity.END or Gravity.CENTER_VERTICAL
 
-                            if(clockTvIndex!=childcount-1) {
+                            if (clockTvIndex != childcount - 1) {
                                 XposedBridge.log("updateClockVisibility Child Count: " + clockTvIndex + " of " + childcount)
                                 val children = arrayOfNulls<View>(childcount - 1)
                                 var k = 0
@@ -219,7 +217,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                             }
                             XposedBridge.log("updateClockVisibility Done")
                             doing = false
-                        }else {
+                        } else {
                             XposedBridge.log("doing = true")
                         }
 
@@ -261,14 +259,21 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                         XposedBridge.log("TEST: " + param.args)
                         XposedBridge.log("TEST: " + param.args.size)
                     }
+
                     @Throws(Throwable::class)
                     override fun afterHookedMethod(param: MethodHookParam) {
                         XposedBridge.log("TEST: " + param.args)
                         // mIconController.setIconVisibility(mNFC, false);
-                        val mIconController = getMember(lpparam, param,
-                            "com.android.systemui.statusbar.phone.PhoneStatusBarPolicy", "mIconController")
-                        val mNFC = getMember(lpparam, param,
-                            "java.lang.String", "mNFC")
+                        val mIconController = getMember(
+                            lpparam,
+                            param,
+                            "com.android.systemui.statusbar.phone.PhoneStatusBarPolicy",
+                            "mIconController"
+                        )
+                        val mNFC = getMember(
+                            lpparam, param,
+                            "java.lang.String", "mNFC"
+                        )
                         callMethod(mIconController, "setIconVisibility", mNFC, false)
                     }
                 }
@@ -276,7 +281,12 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
         }
     }
 
-    fun getMember(lpparam: LoadPackageParam, mhparam: XC_MethodHook.MethodHookParam, pkg_class_name: String, field_name: String) : Any?{
+    fun getMember(
+        lpparam: LoadPackageParam,
+        mhparam: XC_MethodHook.MethodHookParam,
+        pkg_class_name: String,
+        field_name: String
+    ): Any? {
         val clazz = findClass(
             pkg_class_name,
             lpparam.classLoader

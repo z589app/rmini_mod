@@ -19,13 +19,14 @@
             app:summary="@string/title_remove_carrier_keyguard"></SwitchPreferenceCompat>
         <SwitchPreferenceCompat
             app:key="remove_nfc_icon"
-            app:summary="@string/title_remove_nfc_icon" ></SwitchPreferenceCompat>
+            app:summary="@string/title_remove_nfc_icon"></SwitchPreferenceCompat>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/other">
         <SwitchPreferenceCompat
+            app:isPreferenceVisible="false"
             app:key="move_clock_right"
-            app:summary="@string/title_move_clock_right" app:isPreferenceVisible="false"></SwitchPreferenceCompat>
+            app:summary="@string/title_move_clock_right"></SwitchPreferenceCompat>
         <Preference
             android:title="@string/app_name"
             app:summary="@string/author">
