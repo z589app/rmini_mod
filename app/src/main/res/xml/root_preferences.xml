@@ -8,24 +8,24 @@
     <PreferenceCategory app:title="@string/wallpaper">
         <SwitchPreferenceCompat
             app:key="change_wallpaper"
-            app:title="@string/title_change_wallpaper"></SwitchPreferenceCompat>
+            app:summary="@string/title_change_wallpaper"></SwitchPreferenceCompat>
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/statubar">
         <SwitchPreferenceCompat
             app:key="remove_carrier_statusbar"
-            app:title="@string/title_remove_carrier_statusbar"></SwitchPreferenceCompat>
+            app:summary="@string/title_remove_carrier_statusbar"></SwitchPreferenceCompat>
         <SwitchPreferenceCompat
             app:key="remove_carrier_keyguard"
-            app:title="@string/title_remove_carrier_keyguard"></SwitchPreferenceCompat>
+            app:summary="@string/title_remove_carrier_keyguard"></SwitchPreferenceCompat>
+        <SwitchPreferenceCompat
+            app:key="remove_nfc_icon"
+            app:summary="@string/title_remove_nfc_icon" ></SwitchPreferenceCompat>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/other">
         <SwitchPreferenceCompat
-            app:key="remove_nfc_icon"
-            app:title="@string/title_remove_nfc_icon" ></SwitchPreferenceCompat>
-        <SwitchPreferenceCompat
             app:key="move_clock_right"
-            app:title="@string/title_move_clock_right" app:isPreferenceVisible="false"></SwitchPreferenceCompat>
+            app:summary="@string/title_move_clock_right" app:isPreferenceVisible="false"></SwitchPreferenceCompat>
         <Preference
             android:title="@string/app_name"
             app:summary="@string/author">

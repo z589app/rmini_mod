@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">RakutenMiniMod</string>
+    <string name="action_settings">設定</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="settings_fragment_label">設定</string>
+
+    <string name="key_change_wallpaper">key_pref_change_wallpaper</string>
+    <string name="title_change_wallpaper">壁紙制限解除</string>
+    <string name="key_remove_carrier_statusbar">key_pref_remove_carrier_text_status_bar</string>
+    <string name="title_remove_carrier_statusbar">キャリアラベル削除（ステータスバー)</string>
+    <string name="key_remove_carrier_keyguard">key_pref_remove_carrier_text_keyguard</string>
+    <string name="title_remove_carrier_keyguard">キャリアラベル削除(ロック画面)</string>
+    <string name="statubar">ステータスバー</string>
+    <string name="wallpaper">壁紙</string>
+    <string name="need_reboot">反映には再起動が必要です</string>
+    <string name="app_url">https://github.com/z589app/rmini_mod</string>
+    <string name="author">z589app</string>
+    <string name="other">他</string>
+    <string name="web_page">Go to web page</string>
+    <string name="title_move_clock_right">Clock to Right</string>
+    <string name="title_remove_nfc_icon">NFCアイコン削除</string>
+</resources>
