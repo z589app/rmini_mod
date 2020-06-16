@@ -17,7 +17,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        preferenceManager.setStorageDeviceProtected()
+        // preferenceManager.setStorageDeviceProtected()
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
     }
 
