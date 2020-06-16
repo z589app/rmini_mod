@@ -21,7 +21,10 @@ const val KEY_REMOVE_CARRIER_KEYGUARD = "remove_carrier_keyguard"
 const val KEY_MOVE_CLOCK_RIGHT = "move_clock_right"
 const val KEY_REMOVE_NFC_ICON = "remove_nfc_icon"
 
-class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
+const val SHARED_PREF_DIR = "/data/user_de/0/com.z589app.rmini_mod/shared_prefs/"
+const val SHARED_PREF_FILE = "com.z589app.rmini_mod_preferences.xml"
+
+class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit {
     private var mContext: Context? = null
 
     private var doing = false
@@ -29,27 +32,19 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
     var xsp: XSharedPreferences? = null
 
    fun prefLoad(key: String): Boolean{
-        if(xsp==null){
-            val file = File(SHARED_PREF_DIR, SHARED_PREF_FILE)
-            if (file.exists()) {
-                xsp = XSharedPreferences(file)
-                // val xsp = XSharedPreferences(BuildConfig.APPLICATION_ID)
-                xsp!!.makeWorldReadable()
-                xsp!!.reload()
+       if(xsp!=null){
+           return xsp!!.getBoolean(key, false)
+       }else{
+           return false
+       }
+    }
 
-                XposedBridge.log("Pref: " + xsp?.file)
-                XposedBridge.log("Pref: " + xsp?.file?.canRead())
-                XposedBridge.log("Pref: " + xsp?.all)
-
-                return xsp!!.getBoolean(key, true)
-            }else {
-                XposedBridge.log("Pref: FileNotFound")
-                return true
-            }
-        }else{
-            XposedBridge.log("Pref Loaded: " + xsp?.all)
-            return xsp!!.getBoolean(key,true)
-        }
+    override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam?) {
+        val file = File(SHARED_PREF_DIR, SHARED_PREF_FILE)
+        xsp = XSharedPreferences(file)
+        XposedBridge.log("Pref: " + xsp?.file)
+        XposedBridge.log("Pref: " + xsp?.file?.canRead())
+        XposedBridge.log("Pref: " + xsp?.all)
     }
 
     @Throws(Throwable::class)
@@ -319,4 +314,5 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
         return field.get(mhparam.thisObject)
 
     }
+
 }
