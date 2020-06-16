@@ -2,15 +2,12 @@ package com.z589app.rmini_mod
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Color
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.core.view.children
 import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
@@ -41,7 +38,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
 
         val file = File(SHARED_PREF_DIR, SHARED_PREF_FILE)
         if (file.exists()) {
-            val xsp = XSharedPreferences(File(SHARED_PREF_DIR, SHARED_PREF_FILE))
+            val xsp = XSharedPreferences(file)
             // val xsp = XSharedPreferences(BuildConfig.APPLICATION_ID)
             xsp.makeWorldReadable()
             xsp.reload()
@@ -54,6 +51,8 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
             removeCarrierKeyguardEnable = xsp.getBoolean("remove_carrier_keyguard", false)
             moveClockRight = xsp.getBoolean("move_clock_right", false)
             removeNFCIcon = xsp.getBoolean("remove_nfc_icon", false)
+        }else {
+            XposedBridge.log("PreFileNotFound")
         }
 
         if (removeCarrierKeyguardEnable) {
@@ -191,10 +190,16 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
 //                        }
 
                         val res = psbView.context.resources
-                        val leftSide = psbView.findViewById<LinearLayout>(res.getIdentifier("status_bar_left_side", "id", "com.android.systemui"))
+                        val leftSide = psbView.findViewById<LinearLayout>(
+                            res.getIdentifier(
+                                "status_bar_left_side",
+                                "id",
+                                "com.android.systemui"
+                            )
+                        )
                         XposedBridge.log("PhoneStatusBarView leftSide: " + leftSide)
 
-                        if(leftSide!=null) {
+                        if (leftSide != null) {
                             val clockTv = leftSide.findViewById<TextView>(
                                 res.getIdentifier(
                                     "clock",
@@ -204,7 +209,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                             )
                             XposedBridge.log("PhoneStatusBarView clockTv: " + clockTv)
 
-                            if(clockTv!=null) {
+                            if (clockTv != null) {
                                 val systemIcons = psbView.findViewById<LinearLayout>(
                                     res.getIdentifier(
                                         "system_icons",
@@ -214,13 +219,13 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                                 )
                                 XposedBridge.log("PhoneStatusBarView systemIcons: " + systemIcons)
 
-                                if(systemIcons!=null){
+                                if (systemIcons != null) {
                                     leftSide.removeView(clockTv)
                                     systemIcons.addView(clockTv)
                                 }
                             }
                         }
-}
+                    }
                 }
             )
         }
@@ -274,7 +279,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                             "mNFC"
                         )
                         XposedBridge.log("updateNFC mNFC: " + mNFC)
-                        if(mIconController!=null && mNFC!=null) {
+                        if (mIconController != null && mNFC != null) {
                             callMethod(mIconController, "setIconVisibility", mNFC, false)
                         }
                     }
@@ -303,4 +308,3 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
 
     }
 }
-

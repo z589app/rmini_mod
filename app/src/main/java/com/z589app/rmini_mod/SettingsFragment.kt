@@ -7,7 +7,8 @@ import androidx.preference.PreferenceFragmentCompat
 import java.io.File
 
 const val TAG_PREF = "rmini_mod.pref"
-const val SHARED_PREF_DIR = "/sdcard/z589.rmini_mod/"
+const val SHARED_PREF_DIR = "/storage/emulated/0/z589.rmini_mod/"
+// const val SHARED_PREF_DIR = "/sdcard/z589.rmini_mod/"
 const val SHARED_PREF_FILE = "pref.xml"
 
 
@@ -50,5 +51,4 @@ class SettingsFragment : PreferenceFragmentCompat(),
         Log.d(TAG_PREF, "RET: " + fromFile.canRead())
         return
     }
-
 }
