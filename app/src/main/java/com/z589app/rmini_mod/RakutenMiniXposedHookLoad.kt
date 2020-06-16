@@ -15,11 +15,37 @@ import java.io.File
 
 
 const val TARGET_PACKAGE = "com.android.systemui"
+const val KEY_CHANGE_WALLPAPER = "change_wallpaper"
+const val KEY_REMOVE_CARRIR_STATUSBAR = "remove_carrier_statusbar"
+const val KEY_REMOVE_CARRIER_KEYGUARD = "remove_carrier_keyguard"
+const val KEY_MOVE_CLOCK_RIGHT = "move_clock_right"
+const val KEY_REMOVE_NFC_ICON = "remove_nfc_icon"
 
-class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
+const val SHARED_PREF_DIR = "/data/user_de/0/com.z589app.rmini_mod/shared_prefs/"
+const val SHARED_PREF_FILE = "com.z589app.rmini_mod_preferences.xml"
+
+class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit {
     private var mContext: Context? = null
 
     private var doing = false
+
+    var xsp: XSharedPreferences? = null
+
+   fun prefLoad(key: String): Boolean{
+       if(xsp!=null){
+           return xsp!!.getBoolean(key, false)
+       }else{
+           return false
+       }
+    }
+
+    override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam?) {
+        val file = File(SHARED_PREF_DIR, SHARED_PREF_FILE)
+        xsp = XSharedPreferences(file)
+        XposedBridge.log("Pref: " + xsp?.file)
+        XposedBridge.log("Pref: " + xsp?.file?.canRead())
+        XposedBridge.log("Pref: " + xsp?.all)
+    }
 
     @Throws(Throwable::class)
     override fun handleLoadPackage(lpparam: LoadPackageParam) {
@@ -30,31 +56,8 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
 
         XposedBridge.log("Hello XPosed")
 
-        var changeWallpaperEnable = false
-        var removeCarrierStatusBarEnable = false
-        var removeCarrierKeyguardEnable = false
-        var moveClockRight = false
-        var removeNFCIcon = false
-
-        val file = File(SHARED_PREF_DIR, SHARED_PREF_FILE)
-        if (file.exists()) {
-            val xsp = XSharedPreferences(File(SHARED_PREF_DIR, SHARED_PREF_FILE))
-            // val xsp = XSharedPreferences(BuildConfig.APPLICATION_ID)
-            xsp.makeWorldReadable()
-            xsp.reload()
-            XposedBridge.log("Pref: " + xsp.file)
-            XposedBridge.log("Pref: " + xsp.file.canRead())
-            XposedBridge.log("Pref: " + xsp.all)
-
-            changeWallpaperEnable = xsp.getBoolean("change_wallpaper", false)
-            removeCarrierStatusBarEnable = xsp.getBoolean("remove_carrier_statusbar", false)
-            removeCarrierKeyguardEnable = xsp.getBoolean("remove_carrier_keyguard", false)
-            moveClockRight = xsp.getBoolean("move_clock_right", false)
-            removeNFCIcon = xsp.getBoolean("remove_nfc_icon", false)
-        }
-
-        if (removeCarrierKeyguardEnable) {
-            // キーガード（画面ロック時）のキャリアラベル。
+        // キーガード（画面ロック時）のキャリアラベル。
+        if (prefLoad(KEY_REMOVE_CARRIER_KEYGUARD)) {
             findAndHookMethod(
                 "com.android.systemui.statusbar.phone.KeyguardStatusBarView",
                 lpparam.classLoader,
@@ -73,7 +76,11 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                         val mContext = XposedHelpers.getObjectField(rl, "mContext") as Context
                         val res: Resources = mContext.resources
                         val id =
-                            res.getIdentifier("keyguard_carrier_text", "id", "com.android.systemui")
+                            res.getIdentifier(
+                                "keyguard_carrier_text",
+                                "id",
+                                "com.android.systemui"
+                            )
 
                         val cl_tv = rl.findViewById<TextView>(id)
                         if (cl_tv != null) {
@@ -87,7 +94,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
 
 
         // 無理やりView削除版
-        if (removeCarrierStatusBarEnable) {
+        if (prefLoad(KEY_REMOVE_CARRIR_STATUSBAR)) {
             findAndHookMethod(
                 "com.android.systemui.statusbar.phone.StatusBar",
                 lpparam.classLoader,
@@ -106,7 +113,8 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                             lpparam.classLoader
                         )
                         XposedBridge.log("updateIsKeyguard 0: " + statusbar_clazz)
-                        val mCarrierTextField = findFieldIfExists(statusbar_clazz, "mCarrierText")
+                        val mCarrierTextField =
+                            findFieldIfExists(statusbar_clazz, "mCarrierText")
                         XposedBridge.log("updateIsKeyguard 1: " + mCarrierTextField)
                         if (mCarrierTextField == null) {
                             return
@@ -130,7 +138,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
         }
 
 
-        if (changeWallpaperEnable) {
+        if (prefLoad(KEY_CHANGE_WALLPAPER)) {
             /// 壁紙変更
             findAndHookMethod(
                 "com.android.systemui.ImageWallpaper",
@@ -150,8 +158,9 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
                 }
             )
         }
-        if (moveClockRight) {
-            /// 時計右寄せ
+
+        /// 時計右寄せ
+        if (prefLoad(KEY_MOVE_CLOCK_RIGHT)) {
             findAndHookMethod(
                 "com.android.systemui.statusbar.phone.PhoneStatusBarView",
                 lpparam.classLoader,
@@ -247,8 +256,9 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
 //                }
 //            )
 //        }
-        if (removeNFCIcon) {
-            /// NFC Icon Remove
+
+        /// NFC Icon Remove
+        if (prefLoad(KEY_REMOVE_NFC_ICON)) {
             findAndHookMethod(
                 "com.android.systemui.statusbar.phone.PhoneStatusBarPolicy",
                 lpparam.classLoader,
@@ -285,7 +295,6 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
             )
         }
 
-
     }
 
     fun getMember(
@@ -305,5 +314,6 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage {
         return field.get(mhparam.thisObject)
 
     }
+
 }
 

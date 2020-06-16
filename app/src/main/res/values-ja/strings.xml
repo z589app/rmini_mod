@@ -33,7 +33,7 @@
     <string name="title_remove_carrier_keyguard">キャリアラベル削除(ロック画面)</string>
     <string name="statubar">ステータスバー</string>
     <string name="wallpaper">壁紙</string>
-    <string name="need_reboot">反映には再起動が必要です</string>
+    <string name="need_reboot">設定の反映には端末の再起動が必要です</string>
     <string name="app_url">https://github.com/z589app/rmini_mod</string>
     <string name="author">z589app</string>
     <string name="other">他</string>
