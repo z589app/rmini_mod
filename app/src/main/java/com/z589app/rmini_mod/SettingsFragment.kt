@@ -7,8 +7,9 @@ import androidx.preference.PreferenceFragmentCompat
 import java.io.File
 
 const val TAG_PREF = "rmini_mod.pref"
-const val SHARED_PREF_DIR = "/storage/emulated/0/z589.rmini_mod/"
-// const val SHARED_PREF_DIR = "/sdcard/z589.rmini_mod/"
+// const val SHARED_PREF_DIR = "/data/user_de/0/com.z589app.rmini_mod/shared_prefs/"
+// const val SHARED_PREF_FILE = "com.z589app.rmini_mod_preferences.xml"
+const val SHARED_PREF_DIR = "/sdcard/z589.rmini_mod/"
 const val SHARED_PREF_FILE = "pref.xml"
 
 
@@ -16,6 +17,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        preferenceManager.setStorageDeviceProtected()
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
     }
 
@@ -31,7 +33,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
         p0?.edit()?.commit()
+        copyToSD()
+        return
+    }
 
+    fun copyToSD(){
         val fromDir = File(context?.filesDir, "../shared_prefs")
         val fromFile = fromDir.listFiles().get(0)
         Log.d(TAG_PREF, fromFile.toString())
@@ -49,6 +55,5 @@ class SettingsFragment : PreferenceFragmentCompat(),
         Log.d(TAG_PREF, "RET: " + fromFile.setReadable(true, false))
         Log.d(TAG_PREF, "RET: " + toFile.canRead())
         Log.d(TAG_PREF, "RET: " + fromFile.canRead())
-        return
     }
 }
