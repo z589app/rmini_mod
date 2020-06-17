@@ -19,8 +19,8 @@ XPosed Module for Rakuten mini
 
 
 ### Permission
-~~~Use WRITE_EXTERNAL_STORAGE for save to setting file. ~~~
-~~~(/sdcard/z589.rmini_mod) ~~~
+~~Use WRITE_EXTERNAL_STORAGE for save to setting file.~~
+~~(/sdcard/z589.rmini_mod)~~
 
 ### Author
 z589app
