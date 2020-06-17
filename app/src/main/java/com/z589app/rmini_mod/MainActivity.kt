@@ -22,19 +22,19 @@ class MainActivity : AppCompatActivity() {
 //                    .setAction("Action", null).show()
 //        }
 
-        // パーミッション
-        val permissionCheck =
-            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            // Android 6.0 のみ、該当パーミッションが許可されていない場合
-            ActivityCompat.requestPermissions(
-                this, arrayOf(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ), REQUEST_CODE
-            )
-        } else {
-        }
+//        // パーミッション
+//        val permissionCheck =
+//            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//
+//        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+//            // Android 6.0 のみ、該当パーミッションが許可されていない場合
+//            ActivityCompat.requestPermissions(
+//                this, arrayOf(
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+//                ), REQUEST_CODE
+//            )
+//        } else {
+//        }
 
     }
 
@@ -43,11 +43,12 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == REQUEST_CODE) {
-            if ((!(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED))) {
-                finish()
-            }
-        }
+//        // パーミッション取れないときは終了
+//        if (requestCode == REQUEST_CODE) {
+//            if ((!(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED))) {
+//                finish()
+//            }
+//        }
         // super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
