@@ -39,5 +39,5 @@
     <string name="other">Other</string>
     <string name="web_page">Go to web page</string>
     <string name="title_move_clock_right">Clock to Right</string>
-    <string name="title_remove_nfc_icon">Remove NFC Icon</string>
+    <string name="title_icon_disable_list">Disable Icons</string>
 </resources>

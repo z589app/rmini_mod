@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.view.children
 import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
@@ -19,7 +20,8 @@ const val KEY_CHANGE_WALLPAPER = "change_wallpaper"
 const val KEY_REMOVE_CARRIR_STATUSBAR = "remove_carrier_statusbar"
 const val KEY_REMOVE_CARRIER_KEYGUARD = "remove_carrier_keyguard"
 const val KEY_MOVE_CLOCK_RIGHT = "move_clock_right"
-const val KEY_REMOVE_NFC_ICON = "remove_nfc_icon"
+const val KEY_ICON_DISABLE_LIST = "icon_disable_list"
+
 
 const val SHARED_PREF_DIR = "/data/user_de/0/com.z589app.rmini_mod/shared_prefs/"
 const val SHARED_PREF_FILE = "com.z589app.rmini_mod_preferences.xml"
@@ -27,7 +29,8 @@ const val SHARED_PREF_FILE = "com.z589app.rmini_mod_preferences.xml"
 class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit {
    var mXSPrefences: XSharedPreferences? = null
 
-    fun prefLoad(key: String) = mXSPrefences?.getBoolean(key, false)?: false
+    fun loadPrefBoolean(key: String) = mXSPrefences?.getBoolean(key, false)?: false
+    fun loadPrefList(key: String) = mXSPrefences?.getStringSet(key, null)?: null
 
     override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam?) {
         val file = File(SHARED_PREF_DIR, SHARED_PREF_FILE)
@@ -46,8 +49,42 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
 
         XposedBridge.log(LOG_TAG + "Hello XPosed")
 
+        // テスト
+        if (loadPrefList(KEY_ICON_DISABLE_LIST)?.isEmpty()==false) {
+            findAndHookMethod(
+                "com.android.systemui.statusbar.phone.StatusIconContainer",
+                lpparam.classLoader,
+                "applyIconStates",
+                object : XC_MethodHook() {
+                    @Throws(Throwable::class)
+                    override fun beforeHookedMethod(param: MethodHookParam) {
+                    }
+
+                    @Throws(Throwable::class)
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        XposedBridge.log(LOG_TAG + "applyIconStates: After Hooked")
+
+                        val ll = param.thisObject as LinearLayout
+                        val disable_list = loadPrefList(KEY_ICON_DISABLE_LIST)
+
+                        for(v in ll.children){
+                            // XposedBridge.log(LOG_TAG + "applyIconStates: child=" + v)
+                            val slot = getMember(lpparam.classLoader, v as Object, "mSlot") as String
+                            // XposedBridge.log(LOG_TAG + "applyIconStates: slot=" + slot)
+
+                            if(disable_list?.contains(slot) == true){
+                                v.visibility = View.GONE
+                            }
+                        }
+
+                    }
+                }
+            )
+        }
+
+
         // キーガード（画面ロック時）のキャリアラベル。
-        if (prefLoad(KEY_REMOVE_CARRIER_KEYGUARD)) {
+        if (loadPrefBoolean(KEY_REMOVE_CARRIER_KEYGUARD)) {
             findAndHookMethod(
                 "com.android.systemui.statusbar.phone.KeyguardStatusBarView",
                 lpparam.classLoader,
@@ -81,7 +118,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
 
 
         // 無理やりView削除版
-        if (prefLoad(KEY_REMOVE_CARRIR_STATUSBAR)) {
+        if (loadPrefBoolean(KEY_REMOVE_CARRIR_STATUSBAR)) {
             findAndHookMethod(
                 "com.android.systemui.statusbar.phone.StatusBar",
                 lpparam.classLoader,
@@ -94,16 +131,11 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
                     @Throws(Throwable::class)
                     override fun afterHookedMethod(param: MethodHookParam) {
                         XposedBridge.log(LOG_TAG + "updateIsKeygurad: After Hooked")
-//                        val statusbar_clazz = findClass(
-//                            "com.android.systemui.statusbar.phone.StatusBar",
-//                            lpparam.classLoader
-//                        )
-//                        val mCarrierTextField =
-//                            findFieldIfExists(statusbar_clazz, "mCarrierText")
-//                                ?: return
-//
-//                        var mCarrierText = mCarrierTextField.get(param.thisObject) as TextView ?: return
-                        var mCarrierText = getMember(lpparam, param, "mCarrierText") as TextView ?: return
+                        var mCarrierText = getMember(lpparam, param, "mCarrierText") as TextView?
+                        if(mCarrierText==null){
+                            return
+                        }
+
                         mCarrierText.text = ""
                         mCarrierText.visibility = View.GONE
                         val parentView = mCarrierText.parent as ViewGroup
@@ -115,7 +147,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
         }
 
 
-        if (prefLoad(KEY_CHANGE_WALLPAPER)) {
+        if (loadPrefBoolean(KEY_CHANGE_WALLPAPER)) {
             /// 壁紙変更
             findAndHookMethod(
                 "com.android.systemui.ImageWallpaper",
@@ -137,7 +169,7 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
         }
 
         /// 時計右寄せ
-        if (prefLoad(KEY_MOVE_CLOCK_RIGHT)) {
+        if (loadPrefBoolean(KEY_MOVE_CLOCK_RIGHT)) {
             findAndHookMethod(
                 "com.android.systemui.statusbar.phone.PhoneStatusBarView",
                 lpparam.classLoader,
@@ -151,28 +183,6 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
                     override fun afterHookedMethod(param: MethodHookParam) {
                         XposedBridge.log(LOG_TAG + "PhoneStatusBarView: After Hooked " + param.thisObject)
                         val psbView = param.thisObject as FrameLayout
-
-//                        // ステータスバーのレイアウト構造。
-//                        // 有益なデバッグ情報
-//                        for(child in psbView.children) {
-//                            XposedBridge.log("PhoneStatusBarView Child: " + child)
-//                            if(child is ViewGroup){
-//                                for(gChild in child.children) {
-//                                    XposedBridge.log("PhoneStatusBarView gChild: " + gChild)
-//                                    if(gChild is ViewGroup){
-//                                        for(ggChild in gChild.children) {
-//                                            XposedBridge.log("PhoneStatusBarView ggChild: " + ggChild)
-//                                            if(ggChild is ViewGroup) {
-//                                                for(gggChild in ggChild.children) {
-//                                                    XposedBridge.log("PhoneStatusBarView gggChild: " + gggChild)
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-
                         val res = psbView.context.resources
                         val leftSide = psbView.findViewById<LinearLayout>(
                             res.getIdentifier(
@@ -206,36 +216,6 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
             )
         }
 
-        /// NFC Icon Remove
-        if (prefLoad(KEY_REMOVE_NFC_ICON)) {
-            findAndHookMethod(
-                "com.android.systemui.statusbar.phone.PhoneStatusBarPolicy",
-                lpparam.classLoader,
-                "updateNFC",
-                object : XC_MethodHook() {
-                    @Throws(Throwable::class)
-                    override fun beforeHookedMethod(param: MethodHookParam) {
-                    }
-
-                    @Throws(Throwable::class)
-                    override fun afterHookedMethod(param: MethodHookParam) {
-                        XposedBridge.log(LOG_TAG + "updateNFC: After Hooked " + param.args)
-                        val mIconController = getMember(
-                            lpparam,
-                            param,
-                            "mIconController"
-                        )?: return
-                        val mNFC = getMember(
-                            lpparam, param,
-                            "mNFC"
-                        )?: return
-                        callMethod(mIconController, "setIconVisibility", mNFC, false)
-                        XposedBridge.log(LOG_TAG + "updateNFC: Done")
-                    }
-                }
-            )
-        }
-
     }
 
     fun getMember(
@@ -243,14 +223,24 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
         mhparam: XC_MethodHook.MethodHookParam,
         field_name: String
     ): Any? {
-        val clazz = findClass(
-            mhparam.thisObject.javaClass.name,
-            lpparam.classLoader
-        )?: return null
-        val field = findFieldIfExists(clazz, field_name)?: return null
-        return field.get(mhparam.thisObject)
-
+        return getMember(
+            lpparam.classLoader,
+            mhparam.thisObject as Object,
+            field_name
+        )
     }
 
+    fun getMember(
+        classLoader: ClassLoader,
+        obj: Object,
+        field_name: String
+    ): Any? {
+        val clazz = findClass(
+            obj.javaClass.name,
+            classLoader
+        )?: return null
+        val field = findFieldIfExists(clazz, field_name)?: return null
+        return field.get(obj)
+    }
 }
 
