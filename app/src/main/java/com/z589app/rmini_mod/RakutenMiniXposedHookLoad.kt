@@ -13,6 +13,7 @@ import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 import java.io.File
+import java.lang.Exception
 
 const val TARGET_PACKAGE = "com.android.systemui"
 const val LOG_TAG = "RMini "
@@ -69,11 +70,22 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
 
                         for(v in ll.children){
                             // XposedBridge.log(LOG_TAG + "applyIconStates: child=" + v)
-                            val slot = getMember(lpparam.classLoader, v as Object, "mSlot") as String
+                            val mSlot = getMember(lpparam.classLoader, v as Object, "mSlot") as String
                             // XposedBridge.log(LOG_TAG + "applyIconStates: slot=" + slot)
 
-                            if(disable_list?.contains(slot) == true){
-                                v.visibility = View.GONE
+                            if(disable_list?.contains(mSlot) == true){
+                                try {
+                                    val mIcon = getMember(
+                                        lpparam.classLoader,
+                                        v as Object,
+                                        "mIcon"
+                                    ) as Object
+                                    XposedHelpers.setBooleanField(mIcon, "visible", false)
+                                }catch (ex: Exception){
+                                    XposedBridge.log(LOG_TAG + "applyIconStates: ex=" + ex)
+                                }
+                                // v.visibility = View.GONE
+                                // XposedHelpers.callMethod(v, "setVisibleState", 1, false)
                             }
                         }
 
