@@ -55,14 +55,11 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
             findAndHookMethod(
                 "com.android.systemui.statusbar.phone.StatusIconContainer",
                 lpparam.classLoader,
-                "applyIconStates",
+                "resetViewStates",
+                // "applyIconStates",
                 object : XC_MethodHook() {
                     @Throws(Throwable::class)
                     override fun beforeHookedMethod(param: MethodHookParam) {
-                    }
-
-                    @Throws(Throwable::class)
-                    override fun afterHookedMethod(param: MethodHookParam) {
                         XposedBridge.log(LOG_TAG + "applyIconStates: After Hooked")
 
                         val ll = param.thisObject as LinearLayout
@@ -75,19 +72,31 @@ class RakutenMiniXposedHookLoad : IXposedHookLoadPackage, IXposedHookZygoteInit 
 
                             if(disable_list?.contains(mSlot) == true){
                                 try {
-                                    val mIcon = getMember(
-                                        lpparam.classLoader,
-                                        v as Object,
-                                        "mIcon"
-                                    ) as Object
-                                    XposedHelpers.setBooleanField(mIcon, "visible", false)
+                                    if(v!=null) {
+                                        val mIcon = getMember(
+                                            lpparam.classLoader,
+                                            v as Object,
+                                            "mIcon"
+                                        )
+                                        if(mIcon!=null) {
+                                            XposedHelpers.setBooleanField(mIcon, "visible", false)
+//                                        }else{
+//                                            XposedBridge.log(LOG_TAG + "applyIconStates: null=" + mSlot)
+//                                            v.visibility = View.GONE
+//                                            XposedHelpers.callMethod(v, "setVisibleState", 1, false)
+                                        }
+                                    }
                                 }catch (ex: Exception){
                                     XposedBridge.log(LOG_TAG + "applyIconStates: ex=" + ex)
                                 }
-                                // v.visibility = View.GONE
-                                // XposedHelpers.callMethod(v, "setVisibleState", 1, false)
+//                            }else{
+//                                XposedBridge.log(LOG_TAG + "applyIconStates: nothing=" + mSlot)
                             }
                         }
+                    }
+
+                    @Throws(Throwable::class)
+                    override fun afterHookedMethod(param: MethodHookParam) {
 
                     }
                 }

@@ -16,12 +16,14 @@
         <item>data_saver</item>
         <item>hotspot</item>
         <item>managed_profile</item>
-        <item>mobile</item>
         <item>nfc</item>
         <item>rotate</item>
         <item>volume</item>
         <item>vpn</item>
-        <item>wifi</item>
         <item>zen</item>
+        <item>airplane</item>
+        <item>location</item>
     </string-array>
+<!--    <item>mobile</item>-->
+<!--    <item>wifi</item>-->
 </resources>
