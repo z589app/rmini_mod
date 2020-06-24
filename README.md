@@ -7,12 +7,15 @@ XPosed Module for Rakuten mini
 ### Download
 [Releases · z589app/rmini_mod](https://github.com/z589app/rmini_mod/releases)
 
+### Show settings UI
+EdXposedManager => Modules => RakutenMiniMod => Launch UI
+
 ### XPosed works
 - [x] Change wallpaper
 - [x] Remove carrier label in status bar
 - [x] Remove carrier label on keyguard
-- [x] Remove NFC Icon
 - [x] Clock Right
+- [x] Remove NFC Icon(and more System)
 
 ### Other works
 - [x] Setting UI
