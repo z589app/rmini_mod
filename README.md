@@ -15,7 +15,7 @@ EdXposedManager => Modules => RakutenMiniMod => Launch UI
 - [x] Remove carrier label in status bar
 - [x] Remove carrier label on keyguard
 - [x] Clock Right
-- [x] Remove NFC Icon(and more System)
+- [x] Removable NFC Icon(and more System Icons)
 
 ### Other works
 - [x] Setting UI
